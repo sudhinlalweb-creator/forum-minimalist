@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — single source of truth. Do not introduce ad hoc colour,
+ * spacing, or radius values outside this file.
+ *
+ * The interface palette is achromatic: every surface, text, border and
+ * control token is pure neutral, with zero chroma. Notion's own neutrals
+ * carry a warm tint (#37352F text, #F7F6F3 sidebar); those are deliberately
+ * NOT used here, because "black and white" rules out the tint. What is
+ * borrowed from Notion is the structure, not the hue — flat surfaces,
+ * hairline borders instead of shadows, 3px radii, and links as body-weight
+ * text rather than a coloured accent.
+ *
+ * Generated avatars are the one deliberate exception (--avatar-*). They are
+ * the only chromatic element in the interface, which is what makes them work
+ * as identity marks: on an otherwise colourless page, hue does the
+ * recognising, and nothing else competes for it.
+ *
+ * Light is the served default, so it lives on :root and dark is opted into
+ * via [data-theme="dark"] on <html>. The toggle is an explicit user choice
+ * rather than a prefers-color-scheme reaction, so an unset preference always
+ * renders light.
+ */
+
+:root {
+  --bg: #ffffff;
+  --raised: #ffffff;
+  --text: #191919;
+  --text-secondary: #6f6f6f;
+  --text-tertiary: #9b9b9b;
+  --comment-text: #373737;
+  --hover-bg: #f1f1f1;
+
+  /* "Accent" is retained as a token name so component classes stay stable,
+     but in an achromatic palette it is simply maximum contrast: near-black
+     fills with white on top. */
+  --accent: #191919;
+  --accent-text: #191919;
+  --accent-text-hover: #000000;
+  --accent-glow: rgb(25 25 25 / 0.12);
+  --on-accent: #ffffff;
+
+  --scrollbar-thumb: #ebebeb;
+
+  --border: #e6e6e6;
+  --border-strong: #d4d4d4;
+
+  /* Generated-avatar palette, consumed by components/avatar.tsx — the one
+     chromatic exception to the achromatic interface (see the file header).
+     These are boring-avatars' own default five, kept because they are chosen
+     to stay distinguishable from each other when a hash lands two marks
+     side by side.
+
+     Kept as custom properties rather than literals so the SVG fills resolve
+     in the browser and can differ per theme. */
+  --avatar-1: #92a1c6;
+  --avatar-2: #146a7c;
+  --avatar-3: #f0ab3d;
+  --avatar-4: #c271b4;
+  --avatar-5: #c20d90;
+
+  /* Activity ramp. The design signals thread activity with depth rather than
+     a count badge ("Depth by shading only"). Notion has no drop shadows to
+     express that with, so the same four-step ramp is carried by border weight
+     and a faint grey fill instead: hotter threads sit darker and outlined
+     harder. See lib/elevation.ts for the reply-count thresholds. */
+  --act-0-bg: #ffffff;
+  --act-0-edge: #eaeaea;
+  --act-1-bg: #fbfbfb;
+  --act-1-edge: #e0e0e0;
+  --act-2-bg: #f7f7f7;
+  --act-2-edge: #d3d3d3;
+  --act-3-bg: #f1f1f1;
+  --act-3-edge: #c4c4c4;
+}
+
+[data-theme="dark"] {
+  --bg: #191919;
+  --raised: #202020;
+  --text: #ededed;
+  --text-secondary: #9b9b9b;
+  --text-tertiary: #6f6f6f;
+  --comment-text: #d4d4d4;
+  --hover-bg: #252525;
+
+  --accent: #ededed;
+  --accent-text: #ededed;
+  --accent-text-hover: #ffffff;
+  --accent-glow: rgb(255 255 255 / 0.16);
+  --on-accent: #191919;
+
+  --scrollbar-thumb: #333333;
+
+  --border: #2f2f2f;
+  --border-strong: #454545;
+
+  /* Same five hues, lifted for a near-black page. The teal and magenta in
+     particular are dark enough at their default values to sink into the
+     background; raising lightness while holding hue keeps a mark recognisable
+     as the same person's across a theme switch. */
+  --avatar-1: #a6b3d4;
+  --avatar-2: #2593aa;
+  --avatar-3: #f5bb5f;
+  --avatar-4: #d18cc5;
+  --avatar-5: #e340ad;
+
+  /* The ramp inverts: hotter threads get lighter, not darker, so "more
+     activity" still reads as "closer to the viewer" against a dark page. */
+  --act-0-bg: #1c1c1c;
+  --act-0-edge: #2b2b2b;
+  --act-1-bg: #202020;
+  --act-1-edge: #343434;
+  --act-2-bg: #252525;
+  --act-2-edge: #3d3d3d;
+  --act-3-bg: #2b2b2b;
+  --act-3-edge: #474747;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-raised: var(--raised);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-comment-text: var(--comment-text);
+  --color-hover-bg: var(--hover-bg);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-text-hover: var(--accent-text-hover);
+  --color-on-accent: var(--on-accent);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-act-0: var(--act-0-bg);
+  --color-act-0-edge: var(--act-0-edge);
+  --color-act-1: var(--act-1-bg);
+  --color-act-1-edge: var(--act-1-edge);
+  --color-act-2: var(--act-2-bg);
+  --color-act-2-edge: var(--act-2-edge);
+  --color-act-3: var(--act-3-bg);
+  --color-act-3-edge: var(--act-3-edge);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale — the design uses exactly these sizes, no others. */
+  --text-2xs: 0.6875rem; /* 11px — meta, counts */
+  --text-xs: 0.75rem; /* 12px — timestamps, labels */
+  --text-sm: 0.8125rem; /* 13px — author names, buttons */
+  --text-base: 0.875rem; /* 14px — comment body */
+  --text-md: 0.9375rem; /* 15px — card titles, lead body */
+  --text-lg: 1.25rem; /* 20px — thread title (h1) */
+
+  /* Notion's radii are near-square: 3px on controls, 4px on containers. The
+     token names are unchanged from the previous scale so component classes
+     did not have to churn — only the values moved. */
+  --radius-sm: 0.1875rem; /* 3px — nav rows */
+  --radius-md: 0.1875rem; /* 3px — buttons, avatars */
+  --radius-lg: 0.25rem; /* 4px — rail items */
+  --radius-xl: 0.25rem; /* 4px — cards */
+
+  --animate-fade-slide-in: fadeSlideIn 0.28s ease both;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+ * These element defaults must sit in @layer base. Unlayered CSS outranks
+ * every layered rule in the cascade regardless of specificity, so an
+ * unlayered `a { color }` would beat Tailwind's text-* utilities — which is
+ * how the Join button once ended up with accent text on an accent background.
+ */
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  ::selection {
+    background: var(--accent-glow);
+  }
+
+  /* With no accent hue to colour links with, they take body colour and are
+     distinguished by underline on hover, the way Notion treats inline links.
+     Components that need a link to read as navigation rather than prose
+     (nav rails, card titles) opt out by setting their own colour. */
+  a {
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--accent-text-hover);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
